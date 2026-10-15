@@ -1,0 +1,73 @@
+# Build the Expo app locally on self-hosted runners: iOS on the Mac mini, Android on the
+# Windows laptop (runner inside WSL2). `eas build --local` needs macOS or Linux.
+# Secrets: EXPO_TOKEN (repo). Per GitHub Environment variable: EAS_PROFILE (dev->development, ...).
+name: Mobile build
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        type: choice
+        options: [dev, staging, prod]
+        required: true
+      platform:
+        type: choice
+        options: [all, ios, android]
+        default: all
+
+permissions:
+  contents: read
+
+env:
+  APP_DIR: apps/mobile
+
+jobs:
+  ios:
+    if: inputs.platform != 'android'
+    runs-on: [self-hosted, macOS, ios]
+    timeout-minutes: 90
+    environment: ${{ inputs.environment }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: eas build (ios, local)
+        working-directory: ${{ env.APP_DIR }}
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          EAS_PROFILE: ${{ vars.EAS_PROFILE }}
+        run: npx -y eas-cli@latest build --local --non-interactive --platform ios --profile "$EAS_PROFILE" --output "$RUNNER_TEMP/app.ipa"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ios-${{ inputs.environment }}-${{ github.run_number }}
+          path: ${{ runner.temp }}/app.ipa
+          retention-days: 14
+
+  android:
+    if: inputs.platform != 'ios'
+    runs-on: [self-hosted, Linux, android]
+    timeout-minutes: 60
+    environment: ${{ inputs.environment }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: eas build (android, local)
+        working-directory: ${{ env.APP_DIR }}
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          EAS_PROFILE: ${{ vars.EAS_PROFILE }}
+        run: npx -y eas-cli@latest build --local --non-interactive --platform android --profile "$EAS_PROFILE" --output "$RUNNER_TEMP/app.aab"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android-${{ inputs.environment }}-${{ github.run_number }}
+          path: ${{ runner.temp }}/app.aab
+          retention-days: 14

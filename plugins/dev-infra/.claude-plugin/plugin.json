@@ -1,0 +1,12 @@
+{
+  "$schema": "https://code.claude.com/schemas/plugin.json",
+  "name": "dev-infra",
+  "displayName": "Dev Infra",
+  "version": "0.5.0",
+  "description": "Deploy environments, GitHub Actions CI/CD and self-hosted runner health checks for Expo iOS/Android + Next.js + Firebase, driven by .dev-infra/environments.yaml.",
+  "author": {
+    "name": "Ilya Kuzich",
+    "email": "ilakuzich@gmail.com"
+  },
+  "keywords": ["environments", "firebase", "expo", "eas", "nextjs", "app-hosting", "github-actions", "ci-cd", "self-hosted-runners"]
+}

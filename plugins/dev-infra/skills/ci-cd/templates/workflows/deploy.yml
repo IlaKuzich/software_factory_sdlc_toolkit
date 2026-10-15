@@ -1,0 +1,45 @@
+# Deploy Firebase (Functions, Firestore rules/indexes, App Hosting) to one environment.
+# Push to main -> dev. staging/prod -> manual run; gate them with GitHub Environment protection rules.
+# Per GitHub Environment variables: GCP_WIF_PROVIDER, GCP_DEPLOY_SA (each env is its own GCP project).
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Target environment
+        type: choice
+        options: [dev, staging, prod]
+        required: true
+
+concurrency:
+  group: deploy-${{ inputs.environment || 'dev' }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  id-token: write   # Workload Identity Federation, no service-account keys
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: ${{ inputs.environment || 'dev' }}
+    env:
+      TARGET_ENV: ${{ inputs.environment || 'dev' }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
+          service_account: ${{ vars.GCP_DEPLOY_SA }}
+      - name: firebase deploy
+        run: npx -y firebase-tools@latest deploy --only functions,firestore,apphosting -P "$TARGET_ENV" --non-interactive

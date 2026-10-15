@@ -1,0 +1,45 @@
+# Verifies self-hosted runners end to end:
+#  1. `registered`: GitHub API says each runner exists, is online and has the right labels.
+#     A job for an offline runner would just queue for 24h, so this check must come first.
+#  2. per-runner doctor jobs: network, toolchain and host settings on the machine itself.
+# Secret: RUNNER_ADMIN_TOKEN, a fine-grained PAT with "Administration: read" on this repo
+# (GITHUB_TOKEN cannot list runners).
+name: Runner health
+
+on:
+  schedule:
+    - cron: "17 */6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  registered:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+      - name: check runners via GitHub API
+        env:
+          GH_TOKEN: ${{ secrets.RUNNER_ADMIN_TOKEN }}
+        run: >-
+          python3 .github/scripts/check_runners.py --repo "$GITHUB_REPOSITORY"
+          --expect "mac-mini:self-hosted,macOS,ios"
+          --expect "win-laptop:self-hosted,Linux,android"
+
+  doctor-ios:
+    needs: registered
+    runs-on: [self-hosted, macOS, ios]
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+      - run: bash .github/scripts/runner_doctor.sh --platform ios
+
+  doctor-android:
+    needs: registered
+    runs-on: [self-hosted, Linux, android]
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+      - run: bash .github/scripts/runner_doctor.sh --platform android

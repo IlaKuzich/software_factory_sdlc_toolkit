@@ -1,0 +1,22 @@
+{
+  "$schema": "https://code.claude.com/schemas/marketplace.json",
+  "name": "sdlc-toolkit",
+  "owner": {
+    "name": "Ilya Kuzich",
+    "email": "ilakuzich@gmail.com"
+  },
+  "description": "Personal Software Factory plugins for bootstrapping and running projects.",
+  "metadata": {
+    "pluginRoot": "./plugins"
+  },
+  "plugins": [
+    {
+      "name": "dev-infra",
+      "source": "./plugins/dev-infra",
+      "description": "Deploy environments, GitHub Actions CI/CD and self-hosted runner health checks for Expo iOS/Android + Next.js + Firebase projects, driven by one spec file.",
+      "version": "0.5.0",
+      "category": "infrastructure",
+      "tags": ["environments", "firebase", "expo", "eas", "nextjs", "github-actions", "ci-cd", "self-hosted-runners"]
+    }
+  ]
+}

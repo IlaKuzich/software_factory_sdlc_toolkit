@@ -1,0 +1,65 @@
+# .dev-infra/environments.yaml — single source of truth for deploy environments.
+# Add an environment here and re-run /dev-infra:environments to propagate it.
+# Never put secrets in this file; reference secret NAMES only.
+version: 1
+
+# Deploys targeting these environments require explicit confirmation (enforced by a hook).
+protected_environments: [prod]
+
+firebase:                       # firebase module
+  firestore_location: eur3      # irreversible
+  functions_region: europe-west1
+  billing_account: ""
+
+apps:
+  mobile:                       # Expo app (iOS + Android)
+    path: apps/mobile
+    name: MyApp
+    bundle_id: com.example.myapp   # iOS bundleIdentifier and Android package base
+    expo_owner: ""              # expo module
+    apple_team_id: ""           # expo-ios module
+  web:                          # Thin Next.js app (SSR), hosted on Firebase App Hosting
+    path: apps/web
+    app_hosting_backend: web
+  functions:                    # Firebase Cloud Functions
+    path: functions
+    runtime: nodejs24
+    secrets: []                 # e.g. [STRIPE_KEY] — set via `firebase functions:secrets:set`
+
+ci:                             # used by /dev-infra:ci-cd and /dev-infra:runners
+  github_repo: owner/repo
+  package_manager: pnpm
+  deploy:
+    on_push_main: dev           # auto-deploy target for pushes to main
+    manual: [staging, prod]     # deployed via workflow_dispatch (GitHub Environments)
+  runners:                      # self-hosted runners; `labels` must match runs-on in workflows
+    - name: mac-mini
+      platform: ios
+      os: macos
+      labels: [self-hosted, macOS, ios]
+      ssh: ""                   # optional, e.g. me@mac-mini.local — lets /dev-infra:runners run the doctor remotely
+    - name: win-laptop
+      platform: android
+      os: wsl                   # wsl (recommended: runner inside WSL2 Ubuntu) | windows (native)
+      labels: [self-hosted, Linux, android]   # native Windows: [self-hosted, Windows, android]
+      ssh: ""
+
+environments:
+  dev:
+    firebase_project: myapp-dev
+    eas_profile: development    # eas.json build profile
+    eas_environment: development   # EAS env-var environment: development | preview | production
+    eas_channel: development    # EAS Update channel
+    app_variant: development    # mobile id suffix -> com.example.myapp.dev, name "MyApp (Dev)"
+  staging:
+    firebase_project: myapp-staging
+    eas_profile: preview
+    eas_environment: preview
+    eas_channel: preview
+    app_variant: preview
+  prod:
+    firebase_project: myapp-prod
+    eas_profile: production
+    eas_environment: production
+    eas_channel: production
+    app_variant: production     # no suffix

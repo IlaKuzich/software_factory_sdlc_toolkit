@@ -1,0 +1,81 @@
+# dev-infra module catalog. Each module is a skill with the same name (skills/<id>/SKILL.md)
+# that follows skills/bootstrap/references/module-contract.md.
+# To add a module: write the skill, add an entry here, bump the plugin version.
+#
+# kind: core      -> always enabled
+#       platform  -> an app/runtime target; pick any subset
+#       service   -> optional capability
+# requires: modules that must be enabled (and set up) first
+# status: stable | beta | planned (planned = listed for choice, no skill yet)
+modules:
+  - id: workstation
+    kind: core
+    summary: CLI tools and logins on the developer machine (gh, gcloud, firebase, node/pnpm)
+    requires: []
+    status: stable
+
+  - id: project-repo
+    kind: core
+    summary: pnpm monorepo, private GitHub repo, .dev-infra spec, DEVINFRA.md + CLAUDE.md link
+    requires: [workstation]
+    status: stable
+
+  - id: firebase
+    kind: platform
+    summary: Firebase project per environment, billing, Firestore, Auth, Cloud Functions
+    requires: [project-repo]
+    status: stable
+
+  - id: expo
+    kind: platform
+    summary: Expo app + EAS project and per-environment variables (shared by iOS/Android)
+    requires: [project-repo]
+    status: stable
+
+  - id: expo-ios
+    kind: platform
+    summary: iOS target — Apple Developer, Xcode toolchain, signing via EAS
+    requires: [expo]
+    status: stable
+
+  - id: expo-android
+    kind: platform
+    summary: Android target — JDK/SDK toolchain, keystore via EAS, optional Google Play
+    requires: [expo]
+    status: stable
+
+  - id: web-nextjs
+    kind: platform
+    summary: Thin Next.js SSR app on Firebase App Hosting
+    requires: [project-repo, firebase]
+    status: stable
+
+  - id: ci-cd
+    kind: service
+    summary: GitHub Actions — PR checks, per-environment deploys, mobile builds, GitHub Environments/secrets
+    requires: [project-repo]
+    status: stable
+
+  - id: runners
+    kind: service
+    summary: Self-hosted runners (Mac mini for iOS, Windows/WSL2 for Android) + health checks
+    requires: [ci-cd]
+    status: stable
+
+  - id: e2e-playwright
+    kind: service
+    summary: Playwright end-to-end tests for the web app — locally, on PRs and as post-deploy smoke
+    requires: [web-nextjs]
+    status: stable
+
+  - id: e2e-maestro
+    kind: service
+    summary: Maestro end-to-end UI tests for the Expo app, locally and on runners
+    requires: [expo]
+    status: beta
+
+  - id: artifacts
+    kind: service
+    summary: Shared packages / container images storage (workspace packages first, registry later)
+    requires: [project-repo]
+    status: planned
