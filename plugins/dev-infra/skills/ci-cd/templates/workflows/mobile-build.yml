@@ -28,11 +28,11 @@ jobs:
     timeout-minutes: 90
     environment: ${{ inputs.environment }}
     steps:
-      - uses: actions/checkout@v5
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v5
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
         with:
-          node-version: 22
+          node-version-file: .nvmrc
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - name: eas build (ios, local)
@@ -41,7 +41,7 @@ jobs:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
           EAS_PROFILE: ${{ vars.EAS_PROFILE }}
         run: npx -y eas-cli@latest build --local --non-interactive --platform ios --profile "$EAS_PROFILE" --output "$RUNNER_TEMP/app.ipa"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: ios-${{ inputs.environment }}-${{ github.run_number }}
           path: ${{ runner.temp }}/app.ipa
@@ -53,11 +53,11 @@ jobs:
     timeout-minutes: 60
     environment: ${{ inputs.environment }}
     steps:
-      - uses: actions/checkout@v5
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v5
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
         with:
-          node-version: 22
+          node-version-file: .nvmrc
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - name: eas build (android, local)
@@ -66,7 +66,7 @@ jobs:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
           EAS_PROFILE: ${{ vars.EAS_PROFILE }}
         run: npx -y eas-cli@latest build --local --non-interactive --platform android --profile "$EAS_PROFILE" --output "$RUNNER_TEMP/app.aab"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: android-${{ inputs.environment }}-${{ github.run_number }}
           path: ${{ runner.temp }}/app.aab
