@@ -328,10 +328,20 @@ def check_ci(r, spec, root, enabled, level):
     have = set(json.loads(out)) if code == 0 and out else set()
     for name in spec.get("environments", {}):
         (r.ok if name in have else r.fail)(M, "cloud", f"GitHub Environment {name}", "", f"gh api -X PUT repos/{repo}/environments/{name}")
+        if name in have and "firebase" in enabled:
+            code, out = sh("gh", "variable", "list", "--repo", repo, "--env", name, "--json", "name", "--jq", "[.[].name]")
+            have_vars = set(json.loads(out)) if code == 0 and out else set()
+            need = {"GCP_WIF_PROVIDER", "GCP_DEPLOY_SA", "FUNCTIONS_URL"} | ({"WEB_URL"} if "web-nextjs" in enabled else set())
+            missing = sorted(need - have_vars)
+            (r.ok if not missing else r.fail)(M, "cloud", f"[{name}] environment variables", ", ".join(missing) if missing else "", "see /dev-infra:ci-cd step 4")
     code, out = sh("gh", "secret", "list", "--repo", repo, "--json", "name", "--jq", "[.[].name]")
     secrets = set(json.loads(out)) if code == 0 and out else set()
-    if "expo" in enabled:
-        (r.ok if "EXPO_TOKEN" in secrets else r.fail)(M, "cloud", "secret EXPO_TOKEN", "", "gh secret set EXPO_TOKEN")
+    # Require only the secrets that workflows actually reference.
+    wf_text = "".join(open(os.path.join(wf, f)).read() for f in os.listdir(wf) if f.endswith((".yml", ".yaml"))) if os.path.isdir(wf) else ""
+    for name in re.findall(r"secrets\.([A-Z0-9_]+)", wf_text):
+        if name == "GITHUB_TOKEN":
+            continue
+        (r.ok if name in secrets else r.fail)(M, "cloud", f"secret {name}", "used by workflows", f"gh secret set {name} --repo {repo}")
     if LEVELS.index(level) >= 2:
         code, out = sh("gh", "run", "list", "--repo", repo, "--workflow", "ci.yml", "--branch", "main", "-L", "1",
                        "--json", "conclusion,status,url")
