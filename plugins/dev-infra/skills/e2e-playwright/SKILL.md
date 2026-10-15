@@ -34,7 +34,7 @@ Steps run with `${CLAUDE_PLUGIN_ROOT}/skills/bootstrap/references/step-protocol.
 4. **Run** — locally: `pnpm --filter web e2e`; against an environment:
    `E2E_BASE_URL=<backend url> E2E_EXPECT_ENV=<env> pnpm turbo run e2e --filter web`.
    Negative check once: a wrong `E2E_EXPECT_ENV` must fail.
-5. **CI** (with `ci-cd`) — PR job on `ubuntu-latest`: install browsers, `turbo run build --filter web`, `CI=1 pnpm --filter web e2e`;
+5. **CI** (with `ci-cd`) — the CI build uses `apps/web/.env` (default dev config; see `web-nextjs`). PR job on `ubuntu-latest`: install browsers, `turbo run build --filter web`, `CI=1 pnpm --filter web e2e`;
    post-deploy job in `deploy.yml`: `E2E_BASE_URL` = the environment's App Hosting URL, `E2E_EXPECT_ENV` = env name;
    upload `playwright-report` on failure.
 

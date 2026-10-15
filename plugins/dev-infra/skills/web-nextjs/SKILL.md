@@ -31,8 +31,10 @@ Config conventions: `${CLAUDE_PLUGIN_ROOT}/skills/environments/references/nextjs
    Configure (confirm): `npx create-next-app@<version> apps/web --ts --app --eslint --src-dir --import-alias "@/*" --use-pnpm --skip-install --disable-git --yes [--tailwind]`.
    Then: **delete the generated `apps/web/pnpm-workspace.yaml`** (a nested workspace file splits the monorepo) after
    moving its `allowBuilds` entries into the root one; drop `packageManager` from the app's package.json; add
-   `"engines": {"node": "<LTS>.x"}` (otherwise App Hosting builds with its default Node); add a `typecheck` script.
-   The template ignores `.env*`: add `!.env.development` if committing public dev values.
+   `"engines": {"node": "<LTS>.x"}` (otherwise App Hosting builds with its default Node); add
+   `"typecheck": "next typegen && tsc --noEmit"` (global `LayoutProps`/`PageProps` types are generated; a clean CI
+   checkout has no `.next/types`). Default public dev config goes in `apps/web/.env` (read by dev, build and start;
+   App Hosting env vars override it): the template ignores `.env*`, so add `!.env`.
    If `pnpm peers check` reports `@types/react` mismatches, pin the web app's `@types/react` to match `@types/react-dom`;
    don't override versions Expo pins in the mobile app.
    Add `firebase` (client) and `firebase-admin` (server) deps.

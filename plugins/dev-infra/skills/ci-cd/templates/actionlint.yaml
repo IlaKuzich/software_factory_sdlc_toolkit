@@ -1,0 +1,5 @@
+# .github/actionlint.yaml — custom labels of self-hosted runners (runners module), so actionlint accepts them.
+self-hosted-runner:
+  labels:
+    - ios
+    - android

@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - name: check runners via GitHub API
         env:
           GH_TOKEN: ${{ secrets.RUNNER_ADMIN_TOKEN }}
@@ -33,7 +33,7 @@ jobs:
     runs-on: [self-hosted, macOS, ios]
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - run: bash .github/scripts/runner_doctor.sh --platform ios
 
   doctor-android:
@@ -41,5 +41,5 @@ jobs:
     runs-on: [self-hosted, Linux, android]
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - run: bash .github/scripts/runner_doctor.sh --platform android
