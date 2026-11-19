@@ -415,6 +415,21 @@ def main():
         check_ci(r, spec, root, enabled, a.level)
     if "e2e-maestro" in active:
         check_maestro(r, root, spec)
+    if "monetization-adapty" in active:
+        M = "monetization-adapty"
+        st_path = os.path.join(root, ".dev-infra", "adapty-state.json")
+        state = json.load(open(st_path)) if os.path.exists(st_path) else None
+        (r.ok if state else r.fail)(M, "config", ".dev-infra/adapty-state.json", "", "run /dev-infra:monetization-adapty")
+        if state:
+            app_id = state.get("app", {}).get("id")
+            (r.ok if app_id else r.fail)(M, "config", "app.id recorded", app_id or "")
+            (r.ok if state.get("access_levels", {}).get("premium") else r.fail)(M, "config", "premium access level recorded")
+            (r.ok if state.get("products") else r.warn)(M, "config", "products recorded", ", ".join(state.get("products", {})))
+            unpublished = [k for k, v in state.get("flows", {}).items() if v.get("status") != "published"]
+            (r.ok if not unpublished else r.warn)(M, "config", "flows published", ", ".join(unpublished))
+            if LEVELS.index(a.level) >= 1 and app_id:
+                code, _ = sh("adapty", "apps", "get", app_id, "--json")
+                (r.ok if code == 0 else r.fail)(M, "cloud", "Adapty app reachable", "", "adapty auth whoami / check app id")
     if "e2e-playwright" in active:
         web = os.path.join(root, spec.get("apps", {}).get("web", {}).get("path", "apps/web"))
         cfg = os.path.join(web, "playwright.config.ts")
