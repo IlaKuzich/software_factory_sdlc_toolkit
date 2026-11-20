@@ -11,6 +11,9 @@ For every step:
    give the exact URL/command, what to click/choose, the typical wait, and **what to send back**.
    **Where the user runs commands** — `! <command>` in the Claude Code prompt has no interactive stdin/TTY:
    - `! <command>` only for non-interactive commands whose output Claude should see.
+   - **Browser consoles** (Apple Developer, App Store Connect, Firebase/Google Cloud consoles): if Claude in Chrome is
+     connected (`workstation` step 7), Claude drives the page in the user's signed-in browser and stops for sign-in,
+     payments and agreements; otherwise give click-by-click steps.
    - **Separate terminal window** for anything that prompts: logins (`gh auth login`, `gcloud auth login`,
      `firebase login`, `eas login`), menus (`eas credentials`), secret entry (`gh secret set`, `eas env:create`
      with a hidden value), `sudo`. Give the exact command (with `cd <dir> &&`) and the answers to choose

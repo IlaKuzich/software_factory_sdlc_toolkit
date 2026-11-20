@@ -56,6 +56,7 @@ manual parts (sign-ups, consoles, logins). Any module can also be run alone, e.g
 | `runners` | service | self-hosted runners (Mac mini, Windows/WSL2) + health checks |
 | `e2e-playwright` | service | Playwright web E2E: local, PR checks, post-deploy smoke |
 | `e2e-maestro` | service (beta) | Maestro E2E flows, locally and on runners |
+| `monetization-adapty` | service (beta) | Adapty subscriptions: products, onboarding/paywall flows from specs, simulator purchases |
 | `artifacts` | service (planned) | shared packages / images storage |
 
 Utility skills:

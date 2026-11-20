@@ -74,6 +74,12 @@ modules:
     requires: [expo]
     status: beta
 
+  - id: monetization-adapty
+    kind: service
+    summary: Subscriptions with Adapty — products, onboarding/paywall flows from specs, react-native-adapty, simulator purchases (StoreKit file)
+    requires: [expo-ios]
+    status: beta
+
   - id: artifacts
     kind: service
     summary: Shared packages / container images storage (workspace packages first, registry later)
