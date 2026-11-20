@@ -27,6 +27,19 @@ Platform-specific toolchains (Xcode, JDK, EAS, Maestro) belong to their modules,
    Configure (no sudo): `brew install openjdk@21` and add `$(brew --prefix openjdk@21)/bin` to PATH in `~/.zshrc`.
    (`brew install --cask zulu@21` needs sudo → user runs it in a separate terminal.)
 
+7. **Claude in Chrome** (optional; lets Claude drive web consoles in the user's own signed-in browser: Apple
+   Developer portal for `monetization-adapty`, App Store Connect, checking web pages for `demo`/`web-nextjs`).
+   Check: the `mcp__claude-in-chrome__*` tools are available in this session (or `/mcp` lists `claude-in-chrome`).
+   Requirements: Chrome or another Chromium browser (not inside WSL), the extension
+   https://chromewebstore.google.com/detail/claude/fcoeoabgfenejglbffodgkkbkcdhcgfn (v1.0.36+), Claude Code signed in
+   with `/login` on a Pro/Max/Team/Enterprise plan (not API keys or Bedrock/Vertex), extension and Claude Code signed in
+   to the **same account and organization**.
+   User: install the extension and sign in; then in this session type `/chrome` → enable (and choose
+   "Enabled by default" to skip this next time). No restart needed; new sessions can also start with `claude --chrome`.
+   Troubleshooting: Chrome running and extension enabled in `chrome://extensions`; `/chrome` → Reconnect extension;
+   `/status` to compare accounts/orgs; if still not detected, restart Chrome and Claude Code. Without it, browser steps
+   fall back to exact click-by-click instructions for the user. Docs: https://code.claude.com/docs/en/chrome.md
+
 ## Done when
 
 All checks pass; record the accounts (GitHub user, Google account) in DEVINFRA.md notes.

@@ -33,8 +33,8 @@ For a native SwiftUI app (no Expo), follow [references/runbook-native-ios.md](re
 
 A1. **Apple Developer access** — the user opens https://developer.apple.com/account/resources/identifiers/list.
    Sign-in page → user signs in. "Access Unavailable … Program License Agreement" → only the Account Holder can accept;
-   the user does it, never Claude. With a browser tool (Claude in Chrome) Claude may drive the portal; without one, give
-   the user the steps.
+   the user does it, never Claude. Prefer Claude in Chrome (`workstation` step 7: `/chrome` in the session) so Claude
+   drives the portal in the user's signed-in browser; without it, give the user the steps.
 A2. **Bundle ID registered** — check the Identifiers list. If missing: `+` next to Identifiers (opening the add URL
    directly can hang) → App IDs → App → description `<App Name> POC` (letters/digits/spaces) → Bundle ID **Explicit**,
    exact value → capabilities unchanged (In-App Purchase is on by default for explicit IDs; verify) → Register.
